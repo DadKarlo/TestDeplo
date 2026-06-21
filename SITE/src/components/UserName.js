@@ -1,0 +1,128 @@
+import { useState } from 'react'
+
+function UserName(props) {
+	const [firstname, setFirstname] = useState('')
+	const [lastname, setLastname] = useState('')
+	const [birthday, setBirthday] = useState('')
+	const [team, setTeam] = useState('')
+
+	const handleCangeFirstname = (e) => {
+		setFirstname(e.target.value)
+		props.firstname(e.target.value)
+	}
+	const handleCangeLastname = (e) => {
+		setLastname(e.target.value)
+		props.lastname(e.target.value)
+	}
+	const handleCangeBirthday = (e) => {
+		setBirthday(e.target.value)
+		props.birthday(e.target.value)
+	}
+	const handleCangeTeam = (e) => {
+		setTeam(e.target.value)
+		props.team(e.target.value)
+	}
+
+	const listTeam = props?.data?.sportsmens?.filter(
+		(person, index, self) =>
+			index === self.findIndex((p) => p.team === person.team),
+	)
+
+	return (
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+			}}
+		>
+			<input
+				style={{
+					padding: '3px',
+					border: '1px solid',
+					borderRadius: '5px',
+					width: '50%',
+					fontFamily: 'Arial',
+					boxSizing: 'border-box',
+					margin: '0.4rem',
+					textAlign: 'center',
+				}}
+				type="text"
+				name="lastname"
+				pattern="[A-Za-zА-ЯЁа-яё0-9\s]{1,50}"
+				title={'Можно использовать A-z и А-я'}
+				maxLength={50}
+				value={lastname}
+				onChange={handleCangeLastname}
+				placeholder={!!props.enru ? 'Name' : 'ФИО участника'}
+				required
+			/>
+			{/* <input
+				style={{
+					padding: '3px',
+					border: '1px solid',
+					borderRadius: '5px',
+					width: '50%',
+					fontFamily: 'Arial',
+					boxSizing: 'border-box',
+					marginBottom: '0.4rem',
+					textAlign: 'center',
+				}}
+				type="text"
+				name="firstname"
+				pattern="[A-Za-zА-ЯЁа-яё\s]{1,25}"
+				title={'Можно использовать A-z и А-я'}
+				maxLength={25}
+				value={firstname}
+				onChange={handleCangeFirstname}
+				placeholder={!!props.enru ? 'Firstname' : 'Имя участника'}
+			/> */}
+
+			<input
+				style={{
+					padding: '3px',
+					border: '1px solid',
+					borderRadius: '5px',
+					width: '50%',
+					fontFamily: 'Arial',
+					boxSizing: 'border-box',
+					marginBottom: '0.4rem',
+					textAlign: 'center',
+				}}
+				type="text"
+				name="birthday"
+				value={birthday}
+				onChange={handleCangeBirthday}
+				placeholder={!!props.enru ? 'Birthday' : 'Дата рождения'}
+			/>
+			<input
+				style={{
+					padding: '3px',
+					border: '1px solid',
+					borderRadius: '5px',
+					width: '50%',
+					fontFamily: 'Arial',
+					boxSizing: 'border-box',
+					marginBottom: '0.4rem',
+					textAlign: 'center',
+				}}
+				type="text"
+				name="team"
+				list="datalistteam"
+				pattern="[A-Za-zА-ЯЁа-яё0-9\s\-\.\,\(\)]{1,50}"
+				title={'Можно использовать A-z и А-я, символы: - , . ( )'}
+				maxLength={50}
+				value={team}
+				onChange={handleCangeTeam}
+				placeholder={!!props.enru ? 'Team' : 'Командa'}
+			/>
+			<datalist id="datalistteam">
+				{listTeam?.map((item, index) => (
+					<option key={index} value={item.team} />
+				))}
+			</datalist>
+		</div>
+	) //???
+}
+export default UserName

@@ -1,0 +1,339 @@
+import { useEffect, useState } from 'react'
+import TdInput from './TdInput'
+import TdTimeStart from './TdTimeStart'
+import TdButtonSetup from './TdButtonSetup'
+import TdTimeFinish from './TdTimeFinish'
+import AddSwimmerZ from './AddSwimmerZapliv'
+import TdInputTeam from './TdInputTeam'
+import { API_site } from '../API_URL'
+import {
+	Alert,
+	Button,
+	Tooltip,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogTitle,
+} from '@mui/material'
+
+export default function ShowUserStart(props) {
+	const [data, setDate] = useState(props.data) //ferst render
+	const cat = props.data?.setup?.UseCategory
+	const gro = props.data?.setup?.UseGroup
+
+	useEffect(() => {
+		if (props.data) {
+			setDate(props.data)
+		}
+	}, [props.data])
+
+	const [isLoadingGB, setIsLoadingGB] = useState(false)
+	const [isErrGB, setIsErrGB] = useState('')
+	const greenBazz = async (e) => {
+		e.preventDefault()
+		setIsLoadingGB(true)
+		setIsErrGB('')
+		try {
+			const resApp = await fetch(API_site + '/usesport', {
+				method: 'POST',
+				body: JSON.stringify({
+					id: props.web,
+				}),
+				headers: { 'Content-type': 'application/json' },
+			})
+			if (!resApp.ok) {
+				setIsErrGB('⚠!')
+				setTimeout(() => {
+					setIsErrGB('')
+				}, 1970)
+			}
+			// const resultApp = await resApp.json()
+			// console.log(resultApp)
+			setIsErrGB('✔')
+			setTimeout(() => {
+				setIsErrGB('')
+			}, 1970)
+		} catch (error) {
+			// console.log(error)
+			setIsErrGB('⚠!')
+			setTimeout(() => {
+				setIsErrGB('')
+			}, 1970)
+		}
+		setIsLoadingGB(false)
+		setDialogUpdate(false)
+	}
+
+	const [dialogUpdate, setDialogUpdate] = useState(false)
+
+	// console.log(data) //const zapliv = user.sportsmens.filter((u) => u.ids === i + 1)
+	return (
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+				margin: '2rem',
+			}}
+		>
+			<span
+				style={{
+					fontSize: '1.2rem',
+					fontFamily: 'Arial',
+					whiteSpace: 'pre-line',
+					wordBreak: 'break-word',
+				}}
+			>
+				{data?.setup?.NameCompitition}
+			</span>
+			<span
+				style={{
+					fontSize: '0.7rem',
+					marginBottom: '1.5rem',
+					fontFamily: 'Arial',
+					whiteSpace: 'pre-line',
+					wordBreak: 'break-word',
+				}}
+			>
+				{data?.setup?.Info}
+			</span>
+			<Tooltip
+				arrow
+				placement="bottom"
+				title="Системное распределение структуры заплыва. Если внесены изменения дорожек и заплывов, система изменит порядок на соответствующий по времени участника."
+			>
+				<Button
+					size="small"
+					sx={{
+						color: 'black',
+						backgroundColor: 'lightgrey',
+					}}
+					type="submit"
+					onClick={() => setDialogUpdate(true)}
+				>
+					{!isErrGB
+						? !isLoadingGB
+							? !!props.enru
+								? 'Updating the structure'
+								: 'обновить структуру'
+							: '=✈'
+						: `${isErrGB}`}
+				</Button>
+			</Tooltip>
+			<Dialog
+				open={dialogUpdate}
+				onClose={() => setDialogUpdate(false)}
+				role="alertdialog"
+				keepMounted
+			>
+				<DialogContent>
+					<DialogTitle>
+						Если внесены изменения дорожек и заплывов, система изменит порядок
+						на соответствующий по времени участника.
+					</DialogTitle>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setDialogUpdate(false)} sx={{ mr: 'auto' }}>
+						отмена
+					</Button>
+					<Button onClick={greenBazz} sx={{ color: 'orange' }}>
+						обновить
+					</Button>
+				</DialogActions>
+			</Dialog>
+			<Alert
+				variant="outlined"
+				severity="info"
+				color="gray"
+				sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' } }}
+				onClick={() =>
+					alert(
+						'Добавляя участника или внося изменения в настройки соревнований, программа автоматически выставляет заплыв и дорожку участника. \nОднако, если требуется избежать автоматизации, рекомендуется добавлять участника, нажимая «+» под каждой дистанцией в стартовом протоколе. При этом необходимо указать номер дорожки и заплыва, куда будет помещён участник. \nРедактировать участника ниже также возможно без изменения автоматической структуры.',
+					)
+				}
+			>
+				внесения изменений ниже (в заплывах) не влияют на автоматическое
+				перераспределение
+			</Alert>
+			{data?.sportsmens
+				?.filter(
+					(indids, indexs, selfs) =>
+						indexs === selfs.findIndex((p) => p.ids === indids.ids),
+				)
+				.sort((a, d) => a.ids - d.ids)
+				.map((itemS) => (
+					<div
+						key={itemS.id}
+						style={{
+							paddingLeft: '1rem',
+							paddingRight: '1rem',
+							border: '1px solid',
+							borderRadius: '10px',
+							width: '100%',
+							marginBottom: '0.2rem',
+						}}
+					>
+						<>
+							{itemS.distance}. {itemS.sex}. {cat === 'true' && itemS?.category}{' '}
+							{gro === 'true' && itemS?.group}
+						</>
+						<div>
+							<AddSwimmerZ
+								data={data}
+								ids={itemS.ids}
+								itemD={itemS.distance}
+								itemS={itemS.sex}
+								enru={props.enru}
+								itemC={itemS?.category}
+								itemG={itemS?.group}
+								web={props.web}
+							/>
+						</div>
+						<>
+							{data?.sportsmens
+								?.filter((el) => el.ids === itemS.ids)
+								.filter(
+									(indidz, indexz, selfz) =>
+										indexz === selfz.findIndex((p) => p.idz === indidz.idz),
+								)
+								.sort((a, d) => a.idz - d.idz)
+								.map((itemZ) => (
+									<div
+										key={itemZ.id}
+										style={{
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'center',
+											justifyContent: 'center',
+											fontSize: '0.7rem',
+										}}
+									>
+										<div
+											style={{
+												margin: '1%',
+												marginTop: '0.8rem',
+												padding: '0px',
+												width: '40%',
+												textAlign: 'left',
+											}}
+										>
+											{!!props.enru ? 'Heat' : 'Заплыв'} № {itemZ.idz}
+										</div>
+										<table
+											style={{
+												width: '100%',
+												maxWidth: '500px',
+												marginBottom: '10px',
+											}}
+										>
+											<thead>
+												<tr>
+													<th style={{ fontSize: '0.5rem' }}>
+														{!!props.enru ? 'Lane' : 'Дорожка'}
+													</th>
+													<th
+														style={{
+															fontSize: '0.5rem',
+															textAlign: 'left',
+															paddingLeft: '0.5rem',
+														}}
+													>
+														{!!props.enru ? 'Name' : 'Участник'}
+													</th>
+													{data?.setup?.ShowDate === 'true' && (
+														<th style={{ fontSize: '0.5rem' }}>
+															{!!props.enru ? 'Year' : 'Дата рождения'}
+														</th>
+													)}
+													<th style={{ fontSize: '0.5rem' }}>|</th>
+													{/* РАЗДЕЛИТЕЛЬ */}
+													{data?.setup?.ShowTeam === 'true' && (
+														<th style={{ fontSize: '0.5rem' }}>
+															{!!props.enru ? 'Team ' : 'Команда'}
+														</th>
+													)}
+													<th style={{ fontSize: '0.5rem' }}>|</th>
+													{/* РАЗДЕЛИТЕЛЬ */}
+													{data?.setup?.ShowTime === 'true' && (
+														<th style={{ fontSize: '0.5rem' }}>
+															{!!props.enru ? 'Time' : 'Время'}
+														</th>
+													)}
+													<th style={{ fontSize: '0.5rem' }}>|</th>
+													{/* РАЗДЕЛИТЕЛЬ */}
+													<th style={{ fontSize: '0.5rem' }}>
+														{!!props.enru ? 'Result' : 'Результат'}
+													</th>
+												</tr>
+											</thead>
+											<tbody>
+												{data?.sportsmens
+													?.filter(
+														(el) =>
+															el.ids === itemS.ids && el.idz === itemZ.idz,
+													)
+													.sort((a, d) => a.idr - d.idr)
+													.map((item) => (
+														<tr key={item.id}>
+															<td>{item.idr}</td>
+															<td style={{ textAlign: 'left' }}>
+																{item.lastname} {item.firstname}
+																{/* <TdInput item={item} web={props.web} /> */}
+															</td>
+															{data?.setup?.ShowDate === 'true' && (
+																<td style={{ fontSize: '0.45rem' }}>
+																	{item.birthday}
+																</td>
+															)}
+															<td style={{ fontSize: '0.5rem' }}> </td>
+															{/* РАЗДЕЛИТЕЛЬ */}
+															{data?.setup?.ShowTeam === 'true' && (
+																<td style={{ fontSize: '0.45rem' }}>
+																	{item.team}
+																	{/* <TdInputTeam item={item} web={props.web} /> */}
+																</td>
+															)}
+															<td style={{ fontSize: '0.5rem' }}> </td>
+															{/* РАЗДЕЛИТЕЛЬ */}
+															{data?.setup?.ShowTime === 'true' && (
+																<td style={{ fontSize: '0.45rem' }}>
+																	<TdTimeStart item={item} />
+																</td>
+															)}
+															<td style={{ fontSize: '0.5rem' }}> </td>
+															{/* РАЗДЕЛИТЕЛЬ */}
+															<td
+																style={{
+																	fontSize: '0.45rem',
+																	whiteSpace: 'nowrap',
+																}}
+															>
+																{item.TimeFinish === 'DSQ' ||
+																item.TimeFinish === 'DNS' ? (
+																	<>{item.TimeFinish}</>
+																) : (
+																	<TdTimeFinish item={item} web={props.web} />
+																)}
+															</td>
+															<td>
+																<TdButtonSetup
+																	item={item}
+																	web={props.web}
+																	enru={props.enru}
+																	data={props.data}
+																/>
+																{/* <TdButtonSetup item={item} web={props.web} /> */}
+															</td>
+														</tr>
+													))}
+											</tbody>
+										</table>
+									</div>
+								))}
+						</>
+					</div>
+				))}
+		</div>
+	)
+}
