@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true })) //!!! обработка фор�
 app.use(express.json()) //!!! обязательно для body запроса !!!
 const API = '/dimon08041996reostat12'
 const APIALL = 'http://localhost:5000/dimon08041996reostat12' ///secret code
-const prodaction = 'https://swim-start.ru/'
+const prodaction = 'https://swim-ru.ru/' 
 const port = process.env.PORT || 5000
 
 // Сообщение о том, что сервер запущен и прослушивает указанный порт
