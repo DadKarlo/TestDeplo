@@ -9,7 +9,7 @@ const sport = require('./structure.json')
 app.use(express.urlencoded({ extended: true })) //!!! обработка формы ОБЯЗАТЕЛЬНО!!!
 app.use(express.json()) //!!! обязательно для body запроса !!!
 const API = '/dimon08041996reostat12'
-const APIALL = 'https://https://dadkarlo-testdeplo-5c17.twc1.net/dimon08041996reostat12' 
+const APIALL = 'https://dadkarlo-testdeplo-5c17.twc1.net/dimon08041996reostat12' 
 //const APIALL = 'http://localhost:5000/dimon08041996reostat12' ///secret code
 const prodaction = 'https://swim-start.ru/' 
 const port = process.env.PORT || 5000
