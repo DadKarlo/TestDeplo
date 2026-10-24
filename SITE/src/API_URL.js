@@ -2,4 +2,4 @@
 // export const API_site = 'http://localhost:5000'
 //export const API_site = 'https://swimru.ru/'
 // export const API_site = 'https://api.swim-start.ru/'
-export const API_site = 'https://dadkarlo-testdeplo-5788.twc1.net'
+export const API_site = 'https://dadkarlo-testdeplo-5c17.twc1.net'
